@@ -16,7 +16,8 @@ export type DfsCompetitor = {
 
 function authHeader() {
   const login = process.env["DATAFORSEO_LOGIN"];
-  const password = process.env["DATAFORSEO_PASSWORD"];
+  // DataForSEO uses the API password from the dashboard, not the account password.
+  const password = process.env["DATAFORSEO_API_KEY"] || process.env["DATAFORSEO_PASSWORD"];
   if (!login || !password) return null;
   return `Basic ${Buffer.from(`${login}:${password}`).toString("base64")}`;
 }
