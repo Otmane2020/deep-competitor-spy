@@ -77,12 +77,15 @@ function topTerms(text: string, limit = 15) {
     .map(([w]) => w);
 }
 
-async function fetchPage(url: string): Promise<{ html: string; finalUrl: string } | null> {
+async function fetchPage(
+  url: string,
+  attempt = 0,
+): Promise<{ html: string; finalUrl: string } | null> {
   try {
     const res = await fetch(url, {
       headers: { "user-agent": "Mozilla/5.0 (compatible; SeoScoutBot/1.0)" },
       redirect: "follow",
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(25000),
     });
     if (!res.ok) return null;
     const type = res.headers.get("content-type") ?? "";
@@ -90,6 +93,7 @@ async function fetchPage(url: string): Promise<{ html: string; finalUrl: string 
     return { html: await res.text(), finalUrl: res.url || url };
   } catch (e) {
     console.error("fetchPage failed", url, (e as Error).message);
+    if (attempt < 2) return fetchPage(url, attempt + 1);
     return null;
   }
 }
