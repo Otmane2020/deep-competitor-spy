@@ -88,7 +88,8 @@ async function fetchPage(url: string): Promise<{ html: string; finalUrl: string 
     const type = res.headers.get("content-type") ?? "";
     if (!type.includes("html")) return null;
     return { html: await res.text(), finalUrl: res.url || url };
-  } catch {
+  } catch (e) {
+    console.error("fetchPage failed", url, (e as Error).message);
     return null;
   }
 }
@@ -141,7 +142,7 @@ function internalLinks(html: string, origin: string, max: number) {
 export async function scrapeSite(rawUrl: string) {
   const url = /^https?:\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`;
   const home = await fetchPage(url);
-  if (!home) throw new Error("Impossible de charger cette page.");
+  if (!home) throw new Error(`Impossible de charger ${url} (site injoignable, bloqué ou trop lent).`);
 
   const lang = pick(/<html[^>]*lang=["']([^"']+)["']/i, home.html) || "fr";
   const homeInfo = parsePage(home.html, home.finalUrl);
