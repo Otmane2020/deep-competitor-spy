@@ -8,7 +8,6 @@ export const analyzeSite = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<AnalysisResult> => {
     const apiKey = process.env["DEEPSEEK_API_KEY"];
     if (!apiKey) throw new Error("Clé DeepSeek manquante.");
-    const { scrapeSite, analyzeWithAI } = await import("./analyze.server");
-    const scraped = await scrapeSite(data.url);
-    return analyzeWithAI(scraped, apiKey);
+    const { analyzeSiteFull } = await import("./analyze.server");
+    return analyzeSiteFull(data.url, apiKey);
   });
