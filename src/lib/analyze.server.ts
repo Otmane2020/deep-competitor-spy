@@ -58,11 +58,12 @@ Donne EXACTEMENT 5 concurrents réels et 8 meilleurs mots-clés SEO à cibler.
 Format JSON: {"site":{"title":string,"description":string},"competitors":[{"name":string,"domain":string,"why":string}],"keywords":[{"keyword":string,"intent":string,"difficulty":"low"|"medium"|"high","why":string}]}
 Réponds uniquement avec le JSON, en français.`;
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  const res = await fetch("https://api.deepseek.com/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
+      model: "deepseek-chat",
+      response_format: { type: "json_object" },
       messages: [
         { role: "system", content: "Tu es un expert SEO. Tu réponds uniquement en JSON valide." },
         { role: "user", content: prompt },
@@ -71,8 +72,8 @@ Réponds uniquement avec le JSON, en français.`;
   });
 
   if (res.status === 429) throw new Error("Limite de requêtes atteinte, réessaie dans un instant.");
-  if (res.status === 402) throw new Error("Crédits IA épuisés. Ajoute des crédits dans Lovable AI.");
-  if (!res.ok) throw new Error(`Erreur IA [${res.status}]: ${await res.text()}`);
+  if (res.status === 402) throw new Error("Crédits DeepSeek épuisés.");
+  if (!res.ok) throw new Error(`Erreur DeepSeek [${res.status}]: ${await res.text()}`);
 
   const data = await res.json();
   const raw: string = data.choices?.[0]?.message?.content ?? "";
