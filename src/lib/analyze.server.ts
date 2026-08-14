@@ -15,7 +15,7 @@ function stripHtml(html: string) {
 
 function pick(re: RegExp, html: string) {
   const m = html.match(re);
-  return m ? m[1].trim() : "";
+  return m?.[1] ? m[1].trim() : "";
 }
 
 export async function scrapeSite(rawUrl: string) {
@@ -34,7 +34,7 @@ export async function scrapeSite(rawUrl: string) {
     pick(/name=["']description["'][^>]*content=["']([^"']+)["']/i, html) ||
     pick(/property=["']og:description["'][^>]*content=["']([^"']+)["']/i, html);
   const headings = [...html.matchAll(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/gi)]
-    .map((m) => stripHtml(m[1]))
+    .map((m) => stripHtml(m[1] ?? ""))
     .filter(Boolean)
     .slice(0, 25);
   const text = stripHtml(html).slice(0, 6000);
